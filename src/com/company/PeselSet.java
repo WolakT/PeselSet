@@ -3,6 +3,7 @@ package com.company;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.DuplicateFormatFlagsException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,8 +23,11 @@ public class PeselSet {
         }
         else if( !isPeselValid(p)){
             throw new IllegalArgumentException("Invalid Pesel");}
-        else if (checkIfInSet(p)){
-            throw new IllegalArgumentException("Already in database");
+//        else if (checkIfInSet(p)){
+//            throw new IllegalArgumentException("Already in database");
+//        }
+        else if (isPresent(p)){
+            throw new DuplicateFormatFlagsException("Pesel is already in database");
         }
         else {
             set.add(p);
@@ -43,14 +47,28 @@ public class PeselSet {
     }
 
     private void setNodes(Node nodeTemp, int[] vals, int counter){
+            if(counter <3) {
+                Node[] children = nodeTemp.getNode();
+                children[vals[counter]].setHasValue(true);
+                setNodes(children[vals[counter]], vals, ++counter);
+            }
+    }
 
-            Node[] children = nodeTemp.getNode();
-            children[counter].setHasValue(true);
-            setNodes(children[counter],vals,counter++);
-
-
-
-
+    private boolean isPresent(String p){
+        int[] vals = new int[p.length()];
+        Node current = nodePesel;
+        boolean flag = false;
+        int counter = 0;
+        while(counter <3){
+            Node[] children = current.getNode();
+            System.out.println(p.charAt(counter)-48);
+            if(children[p.charAt(counter)-48].getHasValue()!= true)
+            {return false;}
+            else {flag = true;
+                current = children[p.charAt(counter)-48];
+            counter ++;
+            }
+        } return flag;
 
     }
 
